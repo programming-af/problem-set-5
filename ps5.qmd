@@ -52,5 +52,61 @@ import geopandas as gpd
 import numpy as np
 import matplotlib.pyplot as plt
 warnings.filterwarnings('ignore')
+import requests
+from bs4 import BeautifulSoup
 
 ```
+
+
+## (30 points) Step 1: Develop initial scraper and crawler
+
+#### 1. (Partner 1) Scraping: Go to the first page of the HHS OIG’s “Enforcement Actions”page and scrape and collect the following into a dataset: • Title of the enforcement action • Date • Category (e.g, “Criminal and Civil Actions”) • Link associated with the enforcement action Collect your output into a tidy dataframe and print its head.
+
+```{python}
+### making soup
+url1 = 'https://oig.hhs.gov/fraud/enforcement'
+response1 = requests.get(url1)
+soup1 = BeautifulSoup(response1.content, 'lxml')
+```
+
+```{python}
+### find title of enforcements
+li_blocks = soup1.find_all('h2') #h2 classes with nested 'a' titles. li_blocks[2:21] are the 20 ones
+li_titles = []
+for h2 in li_blocks:
+    # Find all 'a' tags within each 'h2' element
+    for a_tag in h2.find_all('a'):
+        li_titles.append(a_tag)
+
+li_titles[0:5]
+title_df = pd.DataFrame(li_titles) # dataframe with titles
+```
+Title: each title is a h2/href(URL) class, under h2 class. 'h2 class' under 'header class' under 'div class' under 'li class'
+
+```{python}
+### find date
+span_blocks = soup1.find_all('span', attrs={'class': 'text-base-dark padding-right-105'})
+span_blocks
+date_df = pd.DataFrame(span_blocks) # dataframe with titles
+#asked chat gpt 'how to i search for 'span' class with attribute xxx'
+```
+Date: is under span class
+
+
+```{python}
+### find category
+li_blocks = soup1.find_all('li')
+li_blocks[0:10]
+
+```
+Category: each title is a li class.'l1 class' under 'ul class' under 'div class' under 'header class'
+
+```{python}
+### find link
+li_blocks = soup1.find_all('h2')
+li_blocks[0:10]
+
+```
+Link: link=href class, under h2 class. 'h2 class' under 'header class' under 'div class' under 'li class'
+
+#### 2. (Partner 1) Crawling: Then for each enforcement action, click the link and collect the name of the agency involved (e.g., for this link, it would be U.S. Attorney’s Office, Eastern District of Washington).
