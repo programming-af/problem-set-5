@@ -71,17 +71,16 @@ soup1 = BeautifulSoup(response1.content, 'lxml')
 
 ```{python}
 ### find title of enforcements
-li_blocks = soup1.find_all('h2') #h2 classes with nested 'a' titles. li_blocks[2:21] are the 20 ones
+li_blocks = soup1.find_all('h2') # h2 classes with nested 'a' titles. li_blocks[2:21] are the 20 datapoints
 li_titles = []
 for h2 in li_blocks:
-    # Find all 'a' tags within each 'h2' element
     for a_tag in h2.find_all('a'):
         li_titles.append(a_tag)
 li_titles[0:5]
 df_title = pd.DataFrame(li_titles) # dataframe with titles
 df_title.columns = ['title']
 ```
-Title: each title is a h2/href(URL) class, under h2 class. 'h2 class' under 'header class' under 'div class' under 'li class'
+Title: each title is a 'a' class, under h2 class. 'h2 class' under 'header class' under 'div class' under 'li class'
 
 ```{python}
 ### find date
@@ -91,7 +90,7 @@ df_date = pd.DataFrame(span_blocks)
 df_date.columns = ['date']
 #asked chat gpt 'how to i search for 'span' class with attribute xxx'
 ```
-Date: is under span class
+Date: is under 'span' class
 
 
 ```{python}
@@ -101,7 +100,7 @@ li_blocks[0:5]
 df_category = pd.DataFrame(li_blocks_dt)
 df_category.columns = ['category']
 ```
-Category: each title is a li class.'l1 class' under 'ul class' under 'div class' under 'header class'
+Category: each category is a li class (search by attribute).'l1 class' under 'ul class' under 'div class' under 'header class'
 
 ```{python}
 ### find link
@@ -109,20 +108,53 @@ Category: each title is a li class.'l1 class' under 'ul class' under 'div class'
 link_blocks = [link.get('href') for link in li_titles]
 df_link = pd.DataFrame(link_blocks)
 df_link.columns = ['link']
-df_link['link'] = "https://oig.hhs.gov" + df_link['link']
+df_link['link'] = "https://oig.hhs.gov" + df_link['link'] #add front part of link to make it clickable
 ```
 Link: link=href class, under h2 class. 'h2 class' under 'header class' under 'div class' under 'li class'
 
 ```{python}
 ### combine dataframes
 df_Q1 = pd.concat([df_title, df_date, df_category, df_link], axis=1)
-df_Q1.head()
+print(df_Q1.head())
 ```
 
 
 #### 2. (Partner 1) Crawling: Then for each enforcement action, click the link and collect the name of the agency involved (e.g., for this link, it would be U.S. Attorney’s Office, Eastern District of Washington).
 
+```{python}
+### webcrawl
+urls_1_2 = df_Q1['link']
 
+### find agency by finding 'li' tags nested in 'article' tags
+article_tags = []
+for url in urls_1_2:
+    response = requests.get(url)
+    if response.status_code == 200:  # Check if the request was successful
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Find all <articel> tags
+        #article_tags = soup2.find_all('article')
+        
+        # Find all <li> tags within <article> tags
+        articles = soup.find_all('article')
+        for article in articles:
+            li_tags = article.find_all('li')
+            for li in li_tags:
+                article_tags.append(li.get_text(strip=True))  # Append the text of each <li> tag
+    else:
+        print(f"Failed to retrieve {link}")
+
+### make dataframe and remove non-relevant items from list
+df_agency = pd.DataFrame(article_tags)
+df_agency.columns = ['agency']
+df_agency = df_agency[df_agency['agency'].str.contains('Agency', case=False, na=False)]
+
+print(df_agency.head())
+#asked chat gpt 'how to go to every link in a list and extracts all 'li' tags that are nested in 'article' tag and create them into a new list'
+```
+Name of agency is 'li' class, nested in 'ul' nested in 'div' nested in 'article'
+
+*Some links do not have the corresponding agency listed, and a couple (such as "U.S. Attorney's Office, District of Idaho" are not formatted correctly)
 
 ## (30 points) Step 2: Making the scraper dynamic
 

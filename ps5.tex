@@ -313,10 +313,9 @@ head.}\label{partner-1-scraping-go-to-the-first-page-of-the-hhs-oigs-enforcement
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\#\#\# find title of enforcements}
-\NormalTok{li\_blocks }\OperatorTok{=}\NormalTok{ soup1.find\_all(}\StringTok{\textquotesingle{}h2\textquotesingle{}}\NormalTok{) }\CommentTok{\#h2 classes with nested \textquotesingle{}a\textquotesingle{} titles. li\_blocks[2:21] are the 20 ones}
+\NormalTok{li\_blocks }\OperatorTok{=}\NormalTok{ soup1.find\_all(}\StringTok{\textquotesingle{}h2\textquotesingle{}}\NormalTok{) }\CommentTok{\# h2 classes with nested \textquotesingle{}a\textquotesingle{} titles. li\_blocks[2:21] are the 20 datapoints}
 \NormalTok{li\_titles }\OperatorTok{=}\NormalTok{ []}
 \ControlFlowTok{for}\NormalTok{ h2 }\KeywordTok{in}\NormalTok{ li\_blocks:}
-    \CommentTok{\# Find all \textquotesingle{}a\textquotesingle{} tags within each \textquotesingle{}h2\textquotesingle{} element}
     \ControlFlowTok{for}\NormalTok{ a\_tag }\KeywordTok{in}\NormalTok{ h2.find\_all(}\StringTok{\textquotesingle{}a\textquotesingle{}}\NormalTok{):}
 \NormalTok{        li\_titles.append(a\_tag)}
 \NormalTok{li\_titles[}\DecValTok{0}\NormalTok{:}\DecValTok{5}\NormalTok{]}
@@ -325,8 +324,8 @@ head.}\label{partner-1-scraping-go-to-the-first-page-of-the-hhs-oigs-enforcement
 \end{Highlighting}
 \end{Shaded}
 
-Title: each title is a h2/href(URL) class, under h2 class. `h2 class'
-under `header class' under `div class' under `li class'
+Title: each title is a `a' class, under h2 class. `h2 class' under
+`header class' under `div class' under `li class'
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -339,7 +338,7 @@ under `header class' under `div class' under `li class'
 \end{Highlighting}
 \end{Shaded}
 
-Date: is under span class
+Date: is under `span' class
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -351,8 +350,8 @@ Date: is under span class
 \end{Highlighting}
 \end{Shaded}
 
-Category: each title is a li class.'l1 class' under `ul class' under
-`div class' under `header class'
+Category: each category is a li class (search by attribute).'l1 class'
+under `ul class' under `div class' under `header class'
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -361,7 +360,7 @@ Category: each title is a li class.'l1 class' under `ul class' under
 \NormalTok{link\_blocks }\OperatorTok{=}\NormalTok{ [link.get(}\StringTok{\textquotesingle{}href\textquotesingle{}}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ link }\KeywordTok{in}\NormalTok{ li\_titles]}
 \NormalTok{df\_link }\OperatorTok{=}\NormalTok{ pd.DataFrame(link\_blocks)}
 \NormalTok{df\_link.columns }\OperatorTok{=}\NormalTok{ [}\StringTok{\textquotesingle{}link\textquotesingle{}}\NormalTok{]}
-\NormalTok{df\_link[}\StringTok{\textquotesingle{}link\textquotesingle{}}\NormalTok{] }\OperatorTok{=} \StringTok{"https://oig.hhs.gov"} \OperatorTok{+}\NormalTok{ df\_link[}\StringTok{\textquotesingle{}link\textquotesingle{}}\NormalTok{]}
+\NormalTok{df\_link[}\StringTok{\textquotesingle{}link\textquotesingle{}}\NormalTok{] }\OperatorTok{=} \StringTok{"https://oig.hhs.gov"} \OperatorTok{+}\NormalTok{ df\_link[}\StringTok{\textquotesingle{}link\textquotesingle{}}\NormalTok{] }\CommentTok{\#add front part of link to make it clickable}
 \end{Highlighting}
 \end{Shaded}
 
@@ -372,13 +371,85 @@ under `div class' under `li class'
 \begin{Highlighting}[]
 \CommentTok{\#\#\# combine dataframes}
 \NormalTok{df\_Q1 }\OperatorTok{=}\NormalTok{ pd.concat([df\_title, df\_date, df\_category, df\_link], axis}\OperatorTok{=}\DecValTok{1}\NormalTok{)}
+\BuiltInTok{print}\NormalTok{(df\_Q1.head())}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+                                               title              date  \
+0  Boise Nurse Practitioner Sentenced To 48 Month...  November 7, 2024   
+1  Former Traveling Nurse Pleads Guilty To Tamper...  November 7, 2024   
+2  Former Arlington Resident Sentenced To Prison ...  November 7, 2024   
+3  Paroled Felon Sentenced To Six Years For Fraud...  November 7, 2024   
+4  Former Licensed Counselor Sentenced For Defrau...  November 6, 2024   
+
+                     category  \
+0  Criminal and Civil Actions   
+1  Criminal and Civil Actions   
+2  Criminal and Civil Actions   
+3  Criminal and Civil Actions   
+4  Criminal and Civil Actions   
+
+                                                link  
+0  https://oig.hhs.gov/fraud/enforcement/boise-nu...  
+1  https://oig.hhs.gov/fraud/enforcement/former-t...  
+2  https://oig.hhs.gov/fraud/enforcement/former-a...  
+3  https://oig.hhs.gov/fraud/enforcement/paroled-...  
+4  https://oig.hhs.gov/fraud/enforcement/former-l...  
+\end{verbatim}
 
 \paragraph{2. (Partner 1) Crawling: Then for each enforcement action,
 click the link and collect the name of the agency involved (e.g., for
 this link, it would be U.S. Attorney's Office, Eastern District of
 Washington).}\label{partner-1-crawling-then-for-each-enforcement-action-click-the-link-and-collect-the-name-of-the-agency-involved-e.g.-for-this-link-it-would-be-u.s.-attorneys-office-eastern-district-of-washington.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\#\# webcrawl}
+\NormalTok{urls\_1\_2 }\OperatorTok{=}\NormalTok{ df\_Q1[}\StringTok{\textquotesingle{}link\textquotesingle{}}\NormalTok{]}
+
+\CommentTok{\#\#\# find agency by finding \textquotesingle{}li\textquotesingle{} tags nested in \textquotesingle{}article\textquotesingle{} tags}
+\NormalTok{article\_tags }\OperatorTok{=}\NormalTok{ []}
+\ControlFlowTok{for}\NormalTok{ url }\KeywordTok{in}\NormalTok{ urls\_1\_2:}
+\NormalTok{    response }\OperatorTok{=}\NormalTok{ requests.get(url)}
+    \ControlFlowTok{if}\NormalTok{ response.status\_code }\OperatorTok{==} \DecValTok{200}\NormalTok{:  }\CommentTok{\# Check if the request was successful}
+\NormalTok{        soup }\OperatorTok{=}\NormalTok{ BeautifulSoup(response.text, }\StringTok{\textquotesingle{}html.parser\textquotesingle{}}\NormalTok{)}
+        
+        \CommentTok{\# Find all \textless{}articel\textgreater{} tags}
+        \CommentTok{\#article\_tags = soup2.find\_all(\textquotesingle{}article\textquotesingle{})}
+        
+        \CommentTok{\# Find all \textless{}li\textgreater{} tags within \textless{}article\textgreater{} tags}
+\NormalTok{        articles }\OperatorTok{=}\NormalTok{ soup.find\_all(}\StringTok{\textquotesingle{}article\textquotesingle{}}\NormalTok{)}
+        \ControlFlowTok{for}\NormalTok{ article }\KeywordTok{in}\NormalTok{ articles:}
+\NormalTok{            li\_tags }\OperatorTok{=}\NormalTok{ article.find\_all(}\StringTok{\textquotesingle{}li\textquotesingle{}}\NormalTok{)}
+            \ControlFlowTok{for}\NormalTok{ li }\KeywordTok{in}\NormalTok{ li\_tags:}
+\NormalTok{                article\_tags.append(li.get\_text(strip}\OperatorTok{=}\VariableTok{True}\NormalTok{))  }\CommentTok{\# Append the text of each \textless{}li\textgreater{} tag}
+    \ControlFlowTok{else}\NormalTok{:}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Failed to retrieve }\SpecialCharTok{\{}\NormalTok{link}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\CommentTok{\#\#\# make dataframe and remove non{-}relevant items from list}
+\NormalTok{df\_agency }\OperatorTok{=}\NormalTok{ pd.DataFrame(article\_tags)}
+\NormalTok{df\_agency.columns }\OperatorTok{=}\NormalTok{ [}\StringTok{\textquotesingle{}agency\textquotesingle{}}\NormalTok{]}
+\NormalTok{df\_agency }\OperatorTok{=}\NormalTok{ df\_agency[df\_agency[}\StringTok{\textquotesingle{}agency\textquotesingle{}}\NormalTok{].}\BuiltInTok{str}\NormalTok{.contains(}\StringTok{\textquotesingle{}Agency\textquotesingle{}}\NormalTok{, case}\OperatorTok{=}\VariableTok{False}\NormalTok{, na}\OperatorTok{=}\VariableTok{False}\NormalTok{)]}
+
+\BuiltInTok{print}\NormalTok{(df\_agency.head())}
+\CommentTok{\#asked chat gpt \textquotesingle{}how to go to every link in a list and extracts all \textquotesingle{}li\textquotesingle{} tags that are nested in \textquotesingle{}article\textquotesingle{} tag and create them into a new list\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+                                               agency
+1   Agency:November 7, 2024; U.S. Attorney's Offic...
+5   Agency:U.S. Attorney's Office, District of Mas...
+9   Agency:U.S. Attorney's Office, Eastern Distric...
+13  Agency:U.S. Attorney's Office, Middle District...
+17  Agency:U.S. Attorney's Office, Western Distric...
+\end{verbatim}
+
+Name of agency is `li' class, nested in `ul' nested in `div' nested in
+`article'
+
+*Some links do not have the corresponding agency listed
 
 \subsection{(30 points) Step 2: Making the scraper
 dynamic}\label{points-step-2-making-the-scraper-dynamic}
