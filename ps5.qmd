@@ -77,17 +77,18 @@ for h2 in li_blocks:
     # Find all 'a' tags within each 'h2' element
     for a_tag in h2.find_all('a'):
         li_titles.append(a_tag)
-
 li_titles[0:5]
-title_df = pd.DataFrame(li_titles) # dataframe with titles
+df_title = pd.DataFrame(li_titles) # dataframe with titles
+df_title.columns = ['title']
 ```
 Title: each title is a h2/href(URL) class, under h2 class. 'h2 class' under 'header class' under 'div class' under 'li class'
 
 ```{python}
 ### find date
 span_blocks = soup1.find_all('span', attrs={'class': 'text-base-dark padding-right-105'})
-span_blocks
-date_df = pd.DataFrame(span_blocks) # dataframe with titles
+span_blocks[0:5]
+df_date = pd.DataFrame(span_blocks) 
+df_date.columns = ['date']
 #asked chat gpt 'how to i search for 'span' class with attribute xxx'
 ```
 Date: is under span class
@@ -95,18 +96,64 @@ Date: is under span class
 
 ```{python}
 ### find category
-li_blocks = soup1.find_all('li')
-li_blocks[0:10]
-
+li_blocks_dt = soup1.find_all('li', attrs={'class': 'display-inline-block usa-tag text-no-lowercase text-base-darkest bg-base-lightest margin-right-1'})
+li_blocks[0:5]
+df_category = pd.DataFrame(li_blocks_dt)
+df_category.columns = ['category']
 ```
 Category: each title is a li class.'l1 class' under 'ul class' under 'div class' under 'header class'
 
 ```{python}
 ### find link
-li_blocks = soup1.find_all('h2')
-li_blocks[0:10]
-
+#use the list of titles from p1 and extract href
+link_blocks = [link.get('href') for link in li_titles]
+df_link = pd.DataFrame(link_blocks)
+df_link.columns = ['link']
+df_link['link'] = "https://oig.hhs.gov" + df_link['link']
 ```
 Link: link=href class, under h2 class. 'h2 class' under 'header class' under 'div class' under 'li class'
 
+```{python}
+### combine dataframes
+df_Q1 = pd.concat([df_title, df_date, df_category, df_link], axis=1)
+df_Q1.head()
+```
+
+
 #### 2. (Partner 1) Crawling: Then for each enforcement action, click the link and collect the name of the agency involved (e.g., for this link, it would be U.S. Attorney’s Office, Eastern District of Washington).
+
+
+
+## (30 points) Step 2: Making the scraper dynamic
+
+#### 1. Turning the scraper into a function: You will write a function that takes as input a month and a year, and then pulls and formats the enforcement actions like in Step 1 starting from that month+year to today.
+
+#### a
+
+#### b
+
+#### c
+
+
+## (15 points) Step 3: Plot data based on scraped data (using altair)
+
+#### 1. (Partner 2) Plot a line chart that shows: the number of enforcement actions over time (aggregated to each month+year) overall since January 2021,
+
+#### 2. (Partner 1) Plot a line chart that shows: the number of enforcement actions split out by:  • “Criminal and Civil Actions” vs. “State Enforcement Agencies” • Five topics in the “Criminal and Civil Actions” category: “Health Care Fraud”, “Financial Fraud”, “Drug Enforcement”, “Bribery/Corruption”, and “Other”. 
+
+## (15 points) Step 4: Create maps of enforcement activity For these questions, use this US Attorney District shapefile (link) and a Census state shapefile (link)
+
+#### 1. (Partner 1) Map by state: Among actions taken by state-level agencies, clean the state names you collected and plot a choropleth of the number of enforcement actions for each state. Hint: look for “State of” in the agency info!
+
+#### 2. (Partner 2) Map by district: Among actions taken by US Attorney District-level agencies, clean the district names so that you can merge them with the shapefile, and then plot a choropleth of the number of enforcement actions in each US Attorney District. Hint: look for “District” in the agency info.
+
+
+
+##  (10 points) Extra credit: Calculate the enforcement actions on a per-capita basis (Both partners can work together)
+
+#### 1. Use the zip code shapefile from the previous problem set and merge it with zip code level population data. (Go to Census Data Portal, select “ZIP Code Tabulation Area”, check “All 5-digit ZIP Code Tabulation Areas within United States”, and under “P1 TOTAL POPULATION” select “2020: DEC Demographic and Housing Characteristics”. Download the csv.).
+
+#### 2. Conduct a spatial join between zip code shapefile and the district shapefile, then aggregate to get population in each district.
+
+#### 3. Mapthe ratio of enforcement actions in each US Attorney District. You can calculate the ratio by aggregating the number of enforcement actions since January 2021 per district, and dividing it with the population data.
+

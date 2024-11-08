@@ -1,0 +1,456 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else  
+    % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{fvextra}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={PS5 Andy Fan Will Sigal},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{PS5 Andy Fan Will Sigal}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\RecustomVerbatimEnvironment{verbatim}{Verbatim}{
+  showspaces = false,
+  showtabs = false,
+  breaksymbolleft={},
+  breaklines
+}
+
+
+\textbf{PS4:} Due Sat Nov 9 at 5:00PM Central. Worth 100 points.
+
+\subsection{Style Points (10 pts)}\label{style-points-10-pts}
+
+\subsection{Submission Steps (10 pts)}\label{submission-steps-10-pts}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  This problem set is a paired problem set.
+\item
+  Play paper, scissors, rock to determine who goes first. Call that
+  person \emph{Partner 1}.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Partner 1 (name and cnet ID): Andy Fan, fanx
+  \item
+    Partner 2 (name and cnet ID): Will Sigal, Wsigal
+  \end{itemize}
+\item
+  Partner 1 will accept the \texttt{ps5} and then share the link it
+  creates with their partner. You can only share it with one partner so
+  you will not be able to change it after your partner has accepted.
+\item
+  ``This submission is our work alone and complies with the 30538
+  integrity policy.'' Add your initials to indicate your agreement:
+\end{enumerate}
+
+AF WS
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  ``I have uploaded the names of anyone else other than my partner and I
+  worked with on the problem set
+  \textbf{\href{https://docs.google.com/forms/d/185usrCREQaUbvAXpWhChkjghdGgmAZXA3lPWpXLLsts/edit}{here}}''
+  (1 point)
+\item
+  Late coins used this pset: (Andy:0); (Will:0) Late coins left after
+  submission: (Andy: 3) ; (Will: 4)
+\item
+  Knit your \texttt{ps5.qmd} to an PDF file to make \texttt{ps5.pdf},
+
+  \begin{itemize}
+  \tightlist
+  \item
+    The PDF should not be more than 25 pages. Use \texttt{head()} and
+    re-size figures when appropriate.
+  \end{itemize}
+\item
+  (Partner 1): push \texttt{ps5.qmd} and \texttt{ps5.pdf} to your github
+  repo.
+\item
+  (Partner 1): submit \texttt{ps5.pdf} via Gradescope. Add your partner
+  on Gradescope.
+\item
+  (Partner 1): tag your submission in Gradescope
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\#\# SETUP }
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+\ImportTok{import}\NormalTok{ altair }\ImportTok{as}\NormalTok{ alt}
+\ImportTok{import}\NormalTok{ time}
+\ImportTok{import}\NormalTok{ os}
+\ImportTok{import}\NormalTok{ warnings}
+\ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+\ImportTok{import}\NormalTok{ numpy }\ImportTok{as}\NormalTok{ np}
+\ImportTok{import}\NormalTok{ matplotlib.pyplot }\ImportTok{as}\NormalTok{ plt}
+\NormalTok{warnings.filterwarnings(}\StringTok{\textquotesingle{}ignore\textquotesingle{}}\NormalTok{)}
+\ImportTok{import}\NormalTok{ requests}
+\ImportTok{from}\NormalTok{ bs4 }\ImportTok{import}\NormalTok{ BeautifulSoup}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{(30 points) Step 1: Develop initial scraper and
+crawler}\label{points-step-1-develop-initial-scraper-and-crawler}
+
+\paragraph{1. (Partner 1) Scraping: Go to the first page of the HHS
+OIG's ``Enforcement Actions''page and scrape and collect the following
+into a dataset: • Title of the enforcement action • Date • Category
+(e.g, ``Criminal and Civil Actions'') • Link associated with the
+enforcement action Collect your output into a tidy dataframe and print
+its
+head.}\label{partner-1-scraping-go-to-the-first-page-of-the-hhs-oigs-enforcement-actionspage-and-scrape-and-collect-the-following-into-a-dataset-title-of-the-enforcement-action-date-category-e.g-criminal-and-civil-actions-link-associated-with-the-enforcement-action-collect-your-output-into-a-tidy-dataframe-and-print-its-head.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\#\# making soup}
+\NormalTok{url1 }\OperatorTok{=} \StringTok{\textquotesingle{}https://oig.hhs.gov/fraud/enforcement\textquotesingle{}}
+\NormalTok{response1 }\OperatorTok{=}\NormalTok{ requests.get(url1)}
+\NormalTok{soup1 }\OperatorTok{=}\NormalTok{ BeautifulSoup(response1.content, }\StringTok{\textquotesingle{}lxml\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\#\# find title of enforcements}
+\NormalTok{li\_blocks }\OperatorTok{=}\NormalTok{ soup1.find\_all(}\StringTok{\textquotesingle{}h2\textquotesingle{}}\NormalTok{) }\CommentTok{\#h2 classes with nested \textquotesingle{}a\textquotesingle{} titles. li\_blocks[2:21] are the 20 ones}
+\NormalTok{li\_titles }\OperatorTok{=}\NormalTok{ []}
+\ControlFlowTok{for}\NormalTok{ h2 }\KeywordTok{in}\NormalTok{ li\_blocks:}
+    \CommentTok{\# Find all \textquotesingle{}a\textquotesingle{} tags within each \textquotesingle{}h2\textquotesingle{} element}
+    \ControlFlowTok{for}\NormalTok{ a\_tag }\KeywordTok{in}\NormalTok{ h2.find\_all(}\StringTok{\textquotesingle{}a\textquotesingle{}}\NormalTok{):}
+\NormalTok{        li\_titles.append(a\_tag)}
+\NormalTok{li\_titles[}\DecValTok{0}\NormalTok{:}\DecValTok{5}\NormalTok{]}
+\NormalTok{df\_title }\OperatorTok{=}\NormalTok{ pd.DataFrame(li\_titles) }\CommentTok{\# dataframe with titles}
+\NormalTok{df\_title.columns }\OperatorTok{=}\NormalTok{ [}\StringTok{\textquotesingle{}title\textquotesingle{}}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+Title: each title is a h2/href(URL) class, under h2 class. `h2 class'
+under `header class' under `div class' under `li class'
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\#\# find date}
+\NormalTok{span\_blocks }\OperatorTok{=}\NormalTok{ soup1.find\_all(}\StringTok{\textquotesingle{}span\textquotesingle{}}\NormalTok{, attrs}\OperatorTok{=}\NormalTok{\{}\StringTok{\textquotesingle{}class\textquotesingle{}}\NormalTok{: }\StringTok{\textquotesingle{}text{-}base{-}dark padding{-}right{-}105\textquotesingle{}}\NormalTok{\})}
+\NormalTok{span\_blocks[}\DecValTok{0}\NormalTok{:}\DecValTok{5}\NormalTok{]}
+\NormalTok{df\_date }\OperatorTok{=}\NormalTok{ pd.DataFrame(span\_blocks) }
+\NormalTok{df\_date.columns }\OperatorTok{=}\NormalTok{ [}\StringTok{\textquotesingle{}date\textquotesingle{}}\NormalTok{]}
+\CommentTok{\#asked chat gpt \textquotesingle{}how to i search for \textquotesingle{}span\textquotesingle{} class with attribute xxx\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+Date: is under span class
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\#\# find category}
+\NormalTok{li\_blocks\_dt }\OperatorTok{=}\NormalTok{ soup1.find\_all(}\StringTok{\textquotesingle{}li\textquotesingle{}}\NormalTok{, attrs}\OperatorTok{=}\NormalTok{\{}\StringTok{\textquotesingle{}class\textquotesingle{}}\NormalTok{: }\StringTok{\textquotesingle{}display{-}inline{-}block usa{-}tag text{-}no{-}lowercase text{-}base{-}darkest bg{-}base{-}lightest margin{-}right{-}1\textquotesingle{}}\NormalTok{\})}
+\NormalTok{li\_blocks[}\DecValTok{0}\NormalTok{:}\DecValTok{5}\NormalTok{]}
+\NormalTok{df\_category }\OperatorTok{=}\NormalTok{ pd.DataFrame(li\_blocks\_dt)}
+\NormalTok{df\_category.columns }\OperatorTok{=}\NormalTok{ [}\StringTok{\textquotesingle{}category\textquotesingle{}}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+Category: each title is a li class.'l1 class' under `ul class' under
+`div class' under `header class'
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\#\# find link}
+\CommentTok{\#use the list of titles from p1 and extract href}
+\NormalTok{link\_blocks }\OperatorTok{=}\NormalTok{ [link.get(}\StringTok{\textquotesingle{}href\textquotesingle{}}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ link }\KeywordTok{in}\NormalTok{ li\_titles]}
+\NormalTok{df\_link }\OperatorTok{=}\NormalTok{ pd.DataFrame(link\_blocks)}
+\NormalTok{df\_link.columns }\OperatorTok{=}\NormalTok{ [}\StringTok{\textquotesingle{}link\textquotesingle{}}\NormalTok{]}
+\NormalTok{df\_link[}\StringTok{\textquotesingle{}link\textquotesingle{}}\NormalTok{] }\OperatorTok{=} \StringTok{"https://oig.hhs.gov"} \OperatorTok{+}\NormalTok{ df\_link[}\StringTok{\textquotesingle{}link\textquotesingle{}}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+Link: link=href class, under h2 class. `h2 class' under `header class'
+under `div class' under `li class'
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\#\# combine dataframes}
+\NormalTok{df\_Q1 }\OperatorTok{=}\NormalTok{ pd.concat([df\_title, df\_date, df\_category, df\_link], axis}\OperatorTok{=}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{2. (Partner 1) Crawling: Then for each enforcement action,
+click the link and collect the name of the agency involved (e.g., for
+this link, it would be U.S. Attorney's Office, Eastern District of
+Washington).}\label{partner-1-crawling-then-for-each-enforcement-action-click-the-link-and-collect-the-name-of-the-agency-involved-e.g.-for-this-link-it-would-be-u.s.-attorneys-office-eastern-district-of-washington.}
+
+\subsection{(30 points) Step 2: Making the scraper
+dynamic}\label{points-step-2-making-the-scraper-dynamic}
+
+\paragraph{1. Turning the scraper into a function: You will write a
+function that takes as input a month and a year, and then pulls and
+formats the enforcement actions like in Step 1 starting from that
+month+year to
+today.}\label{turning-the-scraper-into-a-function-you-will-write-a-function-that-takes-as-input-a-month-and-a-year-and-then-pulls-and-formats-the-enforcement-actions-like-in-step-1-starting-from-that-monthyear-to-today.}
+
+\paragraph{a}\label{a}
+
+\paragraph{b}\label{b}
+
+\paragraph{c}\label{c}
+
+\subsection{(15 points) Step 3: Plot data based on scraped data (using
+altair)}\label{points-step-3-plot-data-based-on-scraped-data-using-altair}
+
+\paragraph{1. (Partner 2) Plot a line chart that shows: the number of
+enforcement actions over time (aggregated to each month+year) overall
+since January
+2021,}\label{partner-2-plot-a-line-chart-that-shows-the-number-of-enforcement-actions-over-time-aggregated-to-each-monthyear-overall-since-january-2021}
+
+\paragraph{2. (Partner 1) Plot a line chart that shows: the number of
+enforcement actions split out by: • ``Criminal and Civil Actions''
+vs.~``State Enforcement Agencies'' • Five topics in the ``Criminal and
+Civil Actions'' category: ``Health Care Fraud'', ``Financial Fraud'',
+``Drug Enforcement'', ``Bribery/Corruption'', and
+``Other''.}\label{partner-1-plot-a-line-chart-that-shows-the-number-of-enforcement-actions-split-out-by-criminal-and-civil-actions-vs.-state-enforcement-agencies-five-topics-in-the-criminal-and-civil-actions-category-health-care-fraud-financial-fraud-drug-enforcement-briberycorruption-and-other.}
+
+\subsection{(15 points) Step 4: Create maps of enforcement activity For
+these questions, use this US Attorney District shapefile (link) and a
+Census state shapefile
+(link)}\label{points-step-4-create-maps-of-enforcement-activity-for-these-questions-use-this-us-attorney-district-shapefile-link-and-a-census-state-shapefile-link}
+
+\paragraph{1. (Partner 1) Map by state: Among actions taken by
+state-level agencies, clean the state names you collected and plot a
+choropleth of the number of enforcement actions for each state. Hint:
+look for ``State of'' in the agency
+info!}\label{partner-1-map-by-state-among-actions-taken-by-state-level-agencies-clean-the-state-names-you-collected-and-plot-a-choropleth-of-the-number-of-enforcement-actions-for-each-state.-hint-look-for-state-of-in-the-agency-info}
+
+\paragraph{2. (Partner 2) Map by district: Among actions taken by US
+Attorney District-level agencies, clean the district names so that you
+can merge them with the shapefile, and then plot a choropleth of the
+number of enforcement actions in each US Attorney District. Hint: look
+for ``District'' in the agency
+info.}\label{partner-2-map-by-district-among-actions-taken-by-us-attorney-district-level-agencies-clean-the-district-names-so-that-you-can-merge-them-with-the-shapefile-and-then-plot-a-choropleth-of-the-number-of-enforcement-actions-in-each-us-attorney-district.-hint-look-for-district-in-the-agency-info.}
+
+\subsection{(10 points) Extra credit: Calculate the enforcement actions
+on a per-capita basis (Both partners can work
+together)}\label{points-extra-credit-calculate-the-enforcement-actions-on-a-per-capita-basis-both-partners-can-work-together}
+
+\paragraph{1. Use the zip code shapefile from the previous problem set
+and merge it with zip code level population data. (Go to Census Data
+Portal, select ``ZIP Code Tabulation Area'', check ``All 5-digit ZIP
+Code Tabulation Areas within United States'', and under ``P1 TOTAL
+POPULATION'' select ``2020: DEC Demographic and Housing
+Characteristics''. Download the
+csv.).}\label{use-the-zip-code-shapefile-from-the-previous-problem-set-and-merge-it-with-zip-code-level-population-data.-go-to-census-data-portal-select-zip-code-tabulation-area-check-all-5-digit-zip-code-tabulation-areas-within-united-states-and-under-p1-total-population-select-2020-dec-demographic-and-housing-characteristics.-download-the-csv..}
+
+\paragraph{2. Conduct a spatial join between zip code shapefile and the
+district shapefile, then aggregate to get population in each
+district.}\label{conduct-a-spatial-join-between-zip-code-shapefile-and-the-district-shapefile-then-aggregate-to-get-population-in-each-district.}
+
+\paragraph{3. Mapthe ratio of enforcement actions in each US Attorney
+District. You can calculate the ratio by aggregating the number of
+enforcement actions since January 2021 per district, and dividing it
+with the population
+data.}\label{mapthe-ratio-of-enforcement-actions-in-each-us-attorney-district.-you-can-calculate-the-ratio-by-aggregating-the-number-of-enforcement-actions-since-january-2021-per-district-and-dividing-it-with-the-population-data.}
+
+
+
+
+\end{document}
