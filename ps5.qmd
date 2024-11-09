@@ -161,7 +161,7 @@ Name of agency is 'li' class, nested in 'ul' nested in 'div' nested in 'article'
 
 #### 1. Turning the scraper into a function: You will write a function that takes as input a month and a year, and then pulls and formats the enforcement actions like in Step 1 starting from that month+year to today.
 
-#### a 
+#### a (Partner 2) Before writing out your function, write down pseudo-code of the steps that your function will go through. If you use a loop, discuss what kind of loop you will use and how you will define it.
 
 ```{python}
 #1) Check if the year if the year is 2013 or later if not, terminte function
@@ -171,9 +171,10 @@ Name of agency is 'li' class, nested in 'ul' nested in 'div' nested in 'article'
 #5) wait one sec before going to the next page
 ```
 
-#### b
+#### b (Partner 2) Now code up your dynamic scraper and run it to start collecting the enforcement actions since January 2023. How many enforcement actions do you get in your final dataframe? What is the date and details of the earliest enforcement action it scraped?
 
 ```{python}
+
 import time
 from datetime import datetime
 
@@ -227,13 +228,14 @@ def enforcement_scrapper(start_month, start_year):
     start_date = datetime(start_year, start_month, 1)
     scrapper = scrapper[scrapper['Date'] >= start_date]
     return scrapper
+```
+
+```{python}
 twenty_three = enforcement_scrapper(1, 2023)  
 
 print(twenty_three.shape[0])
 
 ```
-
-
 
 
 ```{python}
@@ -245,19 +247,12 @@ print(f"Number of Enforcement Actions: {num_enforcements}")
 ```
 
 
-#### c
+#### c (Partner 1) Now, let’s go a little further back. Test your partner’s code by collecting the actions since January 2021. Note that this can take a while. How many enforcement actions do you get in your final dataframe? What is the date and details of the earliest enforcement action it scraped? Use the dataframe from this process for every question after this
 
 ```{python}
 twenty_one = enforcement_scrapper(1, 2021)
-
 num_enforcements = len(twenty_one)
-print(f"Number of Enforcement Actions: {num_enforcements}")
 
-earliest_action = twenty_one.loc[twenty_one['Date'].idxmin()]
-earliest_date = earliest_action['Date']
-print(f"Earliest Date: {earliest_date.date()}")
-print("Details of the Earliest Enforcement Action:")
-print(earliest_action)
 ```
 
 ```{python}
@@ -312,36 +307,136 @@ twenty_one['Month_Year'] = twenty_one['Date'].dt.to_period('M').dt.to_timestamp(
 monthly_counts = twenty_one.groupby('Month_Year').size().reset_index(name='Count')
 
 line_agg = alt.Chart(monthly_counts).mark_line(point = True).encode(
-  x = alt.X('Month_Year', title = 'Month/Year'),
+  x = alt.X('Month_Year:T', title = 'Month/Year'),
   y = alt.Y('Count:Q', title = 'Number of Actions'),
   tooltip=['Month_Year:T', 'Count:Q']
 ).properties( title = 'Number of Enforcement Actions Over Time (Aggregated by Month-Year)')
 
-line_agg
+line_agg.save("line_agg.png")
 ```
+
+![line_agg](line_agg.png)
 
 #### 2. (Partner 1) Plot a line chart that shows: the number of enforcement actions split out by:  • “Criminal and Civil Actions” vs. “State Enforcement Agencies” • Five topics in the “Criminal and Civil Actions” category: “Health Care Fraud”, “Financial Fraud”, “Drug Enforcement”, “Bribery/Corruption”, and “Other”. 
 
-## (15 points) Step 4: Create maps of enforcement activity For these questions, use this US Attorney District shapefile (link) and a Census state shapefile (link)
+```{python}
+### subset for criminal vs state
+twenty_one1 = twenty_one[twenty_one['Category'].isin(['State Enforcement Agencies', 'Criminal and Civil Actions'])]
+dfQ2_2_1 = twenty_one1.groupby(['Month_Year', 'Category']).size().reset_index(name='Count')
+
+chartQ2_2_1 = alt.Chart(dfQ2_2_1).mark_line(point = True).encode(
+  x = alt.X('Month_Year:T', title = 'Month/Year'),
+  y = alt.Y('Count:Q', title = 'Number of Actions'),
+  color='Category:N',
+  tooltip=['Month_Year:T', 'Count:Q']
+).properties( title = 'Number of Enforcement Actions By Criminal and Civil, VS State Enforcement')
+
+chartQ2_2_1.save("chartQ2_2_1.png")
+```
+
+![chartQ2_2_1](chartQ2_2_1.png)
+
 
 ```{python}
-os.chdir('/Users/willsigal/Desktop')
-import geopandas as gpd
+### subset and categrozie for types of fraud (topics)
+twenty_one2 = twenty_one.copy()
+twenty_one2['Topic']= None
+
+### fucntcion filter
+def categorize_topic(text):
+    if 'Health' in text or 'Medicare' in text or 'Medicaid' in text:
+        return 'Health Care Fraud'
+    elif 'Finance' in text or 'Financial' in text or 'Monetary' in text:
+        return 'Financial Fraud'
+    elif 'Drug' in text or 'Medicine' in text or 'Prescribe' in text or 'Prescribing' in text:
+        return 'Drug Enforcement'
+    elif 'Bribe' in text or 'Bribery' in text or 'Corruption' in text:
+        return 'Bribery/Corruption'
+    else:
+        return 'Other'
+
+twenty_one2['Topic'] = twenty_one2['Title'].apply(categorize_topic)
 ```
+
+```{python}
+### plot
+dfQ2_2_2 = twenty_one2.groupby(['Month_Year', 'Topic']).size().reset_index(name='Count')
+
+chartQ2_2_2 = alt.Chart(dfQ2_2_2).mark_line(point = True).encode(
+  x = alt.X('Month_Year:T', title = 'Month/Year'),
+  y = alt.Y('Count:Q', title = 'Number of Actions'),
+  color='Topic:N',
+  tooltip=['Month_Year:T', 'Count:Q']
+).properties( title = 'Number of Enforcement Actions By Topic of Fraud')
+
+chartQ2_2_2.save("chartQ2_2_2.png")
+```
+
+![chartQ2_2_2](chartQ2_2_2.png)
+
+## (15 points) Step 4: Create maps of enforcement activity For these questions, use this US Attorney District shapefile (link) and a Census state shapefile (link)
+
 
 #### 1. (Partner 1) Map by state: Among actions taken by state-level agencies, clean the state names you collected and plot a choropleth of the number of enforcement actions for each state. Hint: look for “State of” in the agency info!
 
 ```{python}
-state = gpd.read_file('cb_2018_us_state_500k/cb_2018_us_state_500k.shp')
+#os.chdir('/Users/willsigal/Desktop') #will wd
+os.chdir('d:\\UChicago\\Classes\\2024Qfall\\Programming Python\\problem-set-5\\Shapefiles') #andy wd
 
+state = gpd.read_file('cb_2018_us_state_500k/cb_2018_us_state_500k.shp')
 state_geometries = state['geometry']
+```
+
+```{python}
+### df of state gdf
+state_df = pd.DataFrame(state)
+
+### subset scraped df to state agency only
+twenty_one_Q4_1 = twenty_one[twenty_one['Agency'].str.contains('State', na=False)].copy()
+
+### subset to only agencies with state in their names via state_df
+def find_state(title):
+    for state in state_df['NAME']:
+        if state in title:
+            return state
+    return None
+
+twenty_one_Q4_1['State'] = twenty_one_Q4_1['Agency'].apply(find_state)
+
+### groupby
+twenty_one_Q4_1_grouped = twenty_one_Q4_1.groupby('State').size().reset_index(name='Count')
+twenty_one_Q4_1_grouped = twenty_one_Q4_1_grouped.rename(columns={'State': 'NAME'})
+
+### merge into state gpd
+state_merged = state.merge(twenty_one_Q4_1_grouped, on='NAME', how='left')
+state_merged['Count'] = state_merged['Count'].fillna(0)
+state_merged_test = pd.DataFrame(state_merged)
+```
+
+```{python}
+ig, ax = plt.subplots(figsize=(12, 8))  
+state_merged.plot(
+    column='Count', 
+    cmap='viridis', 
+    legend=True, 
+    ax=ax,
+    edgecolor='black',  # Add borders for clarity
+    linewidth=0.5)
+ax.set_title('Enforcement Actions by State', fontsize=14)
+#Removed Alska as it made the graph look horrible
+ax.set_xlim([-130, -65])
+ax.set_ylim([24, 50])
+plt.show()
 ```
 
 #### 2. (Partner 2) Map by district: Among actions taken by US Attorney District-level agencies, clean the district names so that you can merge them with the shapefile, and then plot a choropleth of the number of enforcement actions in each US Attorney District. Hint: look for “District” in the agency info.
 
 ```{python}
-os.chdir('/Users/willsigal/Desktop/US Attorney Districts Shapefile simplified_20241108')
-districts_gdf = gpd.read_file('geo_export_6b570657-b5c6-4bbc-b83a-415e4880d085.shp')
+#os.chdir('/Users/willsigal/Desktop/US Attorney Districts Shapefile simplified_20241108') #will wd
+#districts_gdf = gpd.read_file('geo_export_6b570657-b5c6-4bbc-b83a-415e4880d085.shp') #will import
+
+os.chdir('d:\\UChicago\\Classes\\2024Qfall\\Programming Python\\problem-set-5\\Shapefiles\\US Attorney Districts Shapefile simplified_20241109') #andy wd
+districts_gdf = gpd.read_file('geo_export_5d56b225-6390-4cf1-bb2b-122a8672faf1.shp') #andy import
 
 district_df = pd.DataFrame(districts_gdf)
 
