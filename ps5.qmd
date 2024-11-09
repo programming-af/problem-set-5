@@ -54,6 +54,7 @@ import matplotlib.pyplot as plt
 warnings.filterwarnings('ignore')
 import requests
 from bs4 import BeautifulSoup
+import concurrent.futures
 
 ```
 
@@ -128,24 +129,243 @@ df_Q1.head()
 
 #### 1. Turning the scraper into a function: You will write a function that takes as input a month and a year, and then pulls and formats the enforcement actions like in Step 1 starting from that month+year to today.
 
-#### a
+#### a 
+
+```{python}
+#1) Check if the year if the year is 2013 or later if not, terminte function
+#2) Create dictionary for params and use a while loop for pagnation setting for it to break when there's no next.
+#3) Send Get request to get pages, dates, categories and links
+#4) append new info to our dictionary
+#5) wait one sec before going to the next page
+```
 
 #### b
 
+```{python}
+import time
+from datetime import datetime
+
+def enforcement_scrapper(start_month, start_year):
+    if start_year < 2013:
+        print("Please input a year >= 2013, as enforcement actions before 2013 are unavailable.")
+        return
+
+    base_url = 'https://oig.hhs.gov/fraud/enforcement'
+    current_page = 1
+    results = []
+
+    while True:
+        url = f"{base_url}/?page={current_page}"
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'lxml')
+#titles links
+        titles = []
+        links = []
+        for h2 in soup.find_all('h2'):
+            a_tag = h2.find('a')
+            if a_tag:
+                titles.append(a_tag.get_text(strip=True))
+                links.append("https://oig.hhs.gov" + a_tag['href'])
+
+        #get dates
+        dates = [span.get_text(strip=True) for span in soup.find_all('span', class_='text-base-dark padding-right-105')]
+
+        #get categories
+        categories = [
+            li.get_text(strip=True) for li in soup.find_all('li', class_='display-inline-block usa-tag text-no-lowercase text-base-darkest bg-base-lightest margin-right-1')
+        ]
+
+        for title, date, category, link in zip(titles, dates, categories, links):
+            results.append({'Title': title, 'Date': date, 'Category': category, 'Link': link})
+
+        #check if page has dates earlier than when we're looking
+        date_check = pd.to_datetime(dates, errors='coerce')
+        if date_check.min() < pd.Timestamp(datetime(start_year, start_month, 1)):
+            break
+        
+        current_page += 1
+
+
+        
+        time.sleep(1)
+
+    
+    scrapper = pd.DataFrame(results)
+    scrapper['Date'] = pd.to_datetime(scrapper['Date'])
+    start_date = datetime(start_year, start_month, 1)
+    scrapper = scrapper[scrapper['Date'] >= start_date]
+    return scrapper
+twenty_three = enforcement_scrapper(1, 2023)  
+
+print(twenty_three.shape[0])
+
+```
+
+
+
+
+```{python}
+earliest_date = twenty_three['Date'].min()
+print(f"Earliest Date: {earliest_date.date()}")
+
+num_enforcements = len(twenty_three)
+print(f"Number of Enforcement Actions: {num_enforcements}")
+```
+
+
 #### c
 
+```{python}
+twenty_one = enforcement_scrapper(1, 2021)
+
+num_enforcements = len(twenty_one)
+print(f"Number of Enforcement Actions: {num_enforcements}")
+
+earliest_action = twenty_one.loc[twenty_one['Date'].idxmin()]
+earliest_date = earliest_action['Date']
+print(f"Earliest Date: {earliest_date.date()}")
+print("Details of the Earliest Enforcement Action:")
+print(earliest_action)
+```
+
+```{python}
+
+#my code was taking me far far too long and so I used chat gpt to find how I can increase the speed of my crawler
+import concurrent.futures
+def scrape_link(link):
+    try:
+        response = requests.get(link)
+        detail_soup = BeautifulSoup(response.content, 'lxml')
+        agency_label = detail_soup.find('span', class_='padding-right-2 text-base', text='Agency:')
+        if agency_label:
+            # Get the actual text that follows the Agency: label
+            agency_text = agency_label.next_sibling
+            if agency_text:
+                return agency_text.strip()
+        return None
+    except Exception as e:
+        print(f"Error scraping {link}: {e}")
+        return None
+
+def main():
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = {executor.submit(scrape_link, link): link for link in twenty_one['Link']}
+        agencies = [future.result() for future in futures]
+
+    twenty_one['Agency'] = agencies
+    return twenty_one
+
+results = main()
+```
+
+
+```{python}
+print(f"Number of Enforcement Actions: {num_enforcements}")
+
+earliest_action = twenty_one.loc[twenty_one['Date'].idxmin()]
+earliest_date = earliest_action['Date']
+print(f"Earliest Date: {earliest_date.date()}")
+print("Details of the Earliest Enforcement Action:")
+print(earliest_action)
+```
 
 ## (15 points) Step 3: Plot data based on scraped data (using altair)
 
 #### 1. (Partner 2) Plot a line chart that shows: the number of enforcement actions over time (aggregated to each month+year) overall since January 2021,
 
+```{python}
+import altair as alt
+
+twenty_one['Month_Year'] = twenty_one['Date'].dt.to_period('M').dt.to_timestamp()
+monthly_counts = twenty_one.groupby('Month_Year').size().reset_index(name='Count')
+
+line_agg = alt.Chart(monthly_counts).mark_line(point = True).encode(
+  x = alt.X('Month_Year', title = 'Month/Year'),
+  y = alt.Y('Count:Q', title = 'Number of Actions'),
+  tooltip=['Month_Year:T', 'Count:Q']
+).properties( title = 'Number of Enforcement Actions Over Time (Aggregated by Month-Year)')
+
+line_agg
+```
+
 #### 2. (Partner 1) Plot a line chart that shows: the number of enforcement actions split out by:  • “Criminal and Civil Actions” vs. “State Enforcement Agencies” • Five topics in the “Criminal and Civil Actions” category: “Health Care Fraud”, “Financial Fraud”, “Drug Enforcement”, “Bribery/Corruption”, and “Other”. 
 
 ## (15 points) Step 4: Create maps of enforcement activity For these questions, use this US Attorney District shapefile (link) and a Census state shapefile (link)
 
+```{python}
+os.chdir('/Users/willsigal/Desktop')
+import geopandas as gpd
+```
+
 #### 1. (Partner 1) Map by state: Among actions taken by state-level agencies, clean the state names you collected and plot a choropleth of the number of enforcement actions for each state. Hint: look for “State of” in the agency info!
 
+```{python}
+state = gpd.read_file('cb_2018_us_state_500k/cb_2018_us_state_500k.shp')
+
+state_geometries = state['geometry']
+```
+
 #### 2. (Partner 2) Map by district: Among actions taken by US Attorney District-level agencies, clean the district names so that you can merge them with the shapefile, and then plot a choropleth of the number of enforcement actions in each US Attorney District. Hint: look for “District” in the agency info.
+
+```{python}
+os.chdir('/Users/willsigal/Desktop/US Attorney Districts Shapefile simplified_20241108')
+districts_gdf = gpd.read_file('geo_export_6b570657-b5c6-4bbc-b83a-415e4880d085.shp')
+
+district_df = pd.DataFrame(districts_gdf)
+
+```
+
+```{python}
+district_twentyone_df = twenty_one[twenty_one['Agency'].str.contains('District', na=False)].copy()
+
+```
+
+```{python}
+district_df.head
+```
+```{python}
+#removing the prefixes
+district_twentyone_df['District'] = district_twentyone_df['Agency'].apply(lambda x: x.split(', ')[-1] if ', ' in x else x)
+district_twentyone_df['District'] = district_twentyone_df['District'].str.strip()
+
+district_twentyone_df['District'] = district_twentyone_df['District'].str.replace('U.S. Attorney\'s Office, ', '')
+
+district_twentyone_df['District'].head
+```
+
+```{python}
+enforcement_counts = district_twentyone_df['District'].value_counts().reset_index()
+enforcement_counts.columns = ['District', 'Enforcement Actions']
+```
+
+```{python}
+merged_districts_df = pd.merge(district_df, enforcement_counts, left_on='judicial_d', right_on='District', how='left')
+
+merged_districts_df['Enforcement Actions'] = merged_districts_df['Enforcement Actions'].fillna(0)
+merged_districts_df.columns
+```
+
+```{python}
+gdf = gpd.GeoDataFrame(merged_districts_df, geometry='geometry')
+print(gdf.crs)
+gdf['Enforcement Actions'] = gdf['Enforcement Actions'].fillna(0)
+```
+
+```{python}
+ig, ax = plt.subplots(figsize=(12, 8))  # Adjust figure size
+gdf.plot(
+    column='Enforcement Actions', 
+    cmap='viridis', 
+    legend=True, 
+    ax=ax,
+    edgecolor='black',  # Add borders for clarity
+    linewidth=0.5)
+ax.set_title('Enforcement Actions by Judicial District', fontsize=14)
+#Removed Alska as it made the graph look horrible
+ax.set_xlim([-130, -65])
+ax.set_ylim([24, 50])
+plt.show()
+```
 
 
 
